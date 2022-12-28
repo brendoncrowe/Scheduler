@@ -13,6 +13,12 @@ class ScheduleListController: UIViewController {
     
     // data - an array of events
     var events = [Event]()
+    var isEditingTableView = false {
+        didSet {
+            tableView.isEditing = isEditingTableView
+            navigationItem.leftBarButtonItem?.title = isEditingTableView ? "Done" : "Edit"
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,13 +30,21 @@ class ScheduleListController: UIViewController {
     @IBAction func addNewEvent(segue: UIStoryboardSegue) {
         guard let createEventVC = segue.source as? CreateEvent, let createdEvent = createEventVC.event else { fatalError("Could not access CreateEvent View Controller") }
         
+        
+        // 1. update the data model e.g update the events array
         events.insert(createdEvent, at: 0) // 0 is at the top of the event array
         
-        // created indexPath to be inserted into the table view
+        // created indexPath to be inserted into the table view. This is used to be able to reorder the rows as they will have an assigned index
         let indexPath = IndexPath(row: 0, section: 0) // this constant will represent top of the table view
         
+        // 2. we need to update the table view
         tableView.insertRows(at: [indexPath], with: .automatic)
         
+    }
+    
+    
+    @IBAction func editButtonPressed(_ sender: UIBarButtonItem) {
+        isEditingTableView.toggle()
     }
     
 }
@@ -57,14 +71,24 @@ extension ScheduleListController: UITableViewDataSource {
         
         switch editingStyle {
         case .insert:
+            // only gets called if "insertion control" exists and gets selected 
             print("Insert")
         case .delete:
-            print("Delete")
+            print("deleting...")
+            // remove item from the data model
             events.remove(at: indexPath.row)
+            // update the table view
             tableView.deleteRows(at: [indexPath], with: .automatic)
         default:
             print("....")
         }
+    }
+    
+    // MARK:- reordering rows in table view
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let eventToMove = events[sourceIndexPath.row] // 1. save the event being moved to a new array; event being moved is stored in sourceIndexPath.
+        events.remove(at: sourceIndexPath.row) // 2. remove it from the events array data
+        events.insert(eventToMove, at: destinationIndexPath.row) // 3. insert it back into events array with its new indexPath
     }
 }
 

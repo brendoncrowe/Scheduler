@@ -57,7 +57,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Schedule" id="APu-Yd-Qnx">
-                        <barButtonItem key="leftBarButtonItem" title="Edit" id="PAE-bw-ZDv"/>
+                        <barButtonItem key="leftBarButtonItem" title="Edit" id="PAE-bw-ZDv">
+                            <connections>
+                                <action selector="editButtonPressed:" destination="BYZ-38-t0r" id="wbh-PH-T6w"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" image="plus" catalog="system" id="YG8-gM-iFD">
                             <connections>
                                 <segue destination="X7G-Yf-PNU" kind="presentation" id="Ciz-dI-JT6"/>
