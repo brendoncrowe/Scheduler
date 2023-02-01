@@ -18,31 +18,21 @@ class CreateEventController: UIViewController {
         super.viewDidLoad()
         eventTextField.delegate = self
         event = Event(name: "No event", date: Date())
-  
-        
     }
     
     @IBAction func datePickerChanged(sender: UIDatePicker) {
         event?.date = sender.date
     }
     
-    
     @IBAction func createEventButtonTapped(_ sender: UIButton) {
         event?.name = eventTextField.text ?? "Nothing was typed"
     }
-    
 }
-
-
-
-
 
 extension CreateEventController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-
         return true
     }
-    
 }
