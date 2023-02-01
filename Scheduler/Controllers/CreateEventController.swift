@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CreateEvent: UIViewController {
+class CreateEventController: UIViewController {
     
     @IBOutlet weak var eventTextField: UITextField!
     @IBOutlet weak var eventTime: UIDatePicker!
@@ -37,7 +37,7 @@ class CreateEvent: UIViewController {
 
 
 
-extension CreateEvent: UITextFieldDelegate {
+extension CreateEventController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()

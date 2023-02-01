@@ -13,6 +13,7 @@ class ScheduleListController: UIViewController {
     
     // data - an array of events
     var events = [Event]()
+    
     var isEditingTableView = false {
         didSet {
             tableView.isEditing = isEditingTableView
@@ -20,16 +21,32 @@ class ScheduleListController: UIViewController {
         }
     }
     
+    lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d, yyyy, hh:mm a"
+        formatter.timeZone = .current
+        return formatter
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        events = Event.getTestData()
-        tableView.dataSource = self // DO NOT FORGET THE DATA SOURCE!!
+        events = Event.getTestData().sorted { $0.date < $1.date }
+        tableView.dataSource = self
+        
+        // print path to documents directory
+        print(FileManager.getDocumentsDirectory())
     }
     
     
     @IBAction func addNewEvent(segue: UIStoryboardSegue) {
-        guard let createEventVC = segue.source as? CreateEvent, let createdEvent = createEventVC.event else { fatalError("Could not access CreateEvent View Controller") }
+        guard let createEventVC = segue.source as? CreateEventController, let createdEvent = createEventVC.event else { fatalError("Could not access CreateEvent View Controller") }
         
+        // persist event to documents directory
+        do {
+            try PersistenceHelper.save(event: createdEvent)
+        } catch {
+            print("Error saving event: \(error)")
+        }
         
         // 1. update the data model e.g update the events array
         events.insert(createdEvent, at: 0) // 0 is at the top of the event array
@@ -39,14 +56,12 @@ class ScheduleListController: UIViewController {
         
         // 2. we need to update the table view
         tableView.insertRows(at: [indexPath], with: .automatic)
-        
     }
     
     
     @IBAction func editButtonPressed(_ sender: UIBarButtonItem) {
         isEditingTableView.toggle()
     }
-    
 }
 
 extension ScheduleListController: UITableViewDataSource {
@@ -60,7 +75,7 @@ extension ScheduleListController: UITableViewDataSource {
         let event = events[indexPath.row]
         var cellContent = cell.defaultContentConfiguration()
         cellContent.text = event.name
-        cellContent.secondaryText = event.date.description
+        cellContent.secondaryText = dateFormatter.string(from: event.date)
         cell.contentConfiguration = cellContent
         return cell
     }
